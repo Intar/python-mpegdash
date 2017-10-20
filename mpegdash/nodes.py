@@ -318,6 +318,40 @@ class Descriptor(XMLNode):
         write_attr_value(xmlnode, 'id', self.id)
 
 
+class ContentProtection(Descriptor):
+    def __init__(self):
+        Descriptor.__init__(self)
+
+        self.xmlns_cenc = None                                # xs:string
+        self.cenc_default_KID = None                          # xs:string
+        self.cenc_pssh = None
+
+    def parse(self, xmlnode):
+        Descriptor.parse(self, xmlnode)
+        self.xmlns_cenc = parse_attr_value(xmlnode, 'xmlns:cenc', str)
+        self.cenc_default_KID = parse_attr_value(xmlnode, 'cenc:default_KID', str)
+        if self.xmlns_cenc and self.cenc_default_KID:
+            self.value = None
+            self.cenc_pssh = parse_child_nodes(xmlnode, 'pssh', CencPssh)
+
+    def write(self, xmlnode):
+        Descriptor.write(self, xmlnode)
+        write_attr_value(xmlnode, 'xmlns:cenc', self.xmlns_cenc)
+        write_attr_value(xmlnode, 'cenc:cenc_default_KID', self.cenc_default_KID)
+        write_child_node(xmlnode, 'cenc:pssh', self.cenc_pssh)
+
+
+class CencPssh(XMLNode):
+    def __init__(self):
+        self.value = None                                     # xs:string
+
+    def parse(self, xmlnode):
+        self.key = parse_node_value(xmlnode, str)
+
+    def write(self, xmlnode):
+        write_node_value(xmlnode, self.key)
+
+
 class ContentComponent(XMLNode):
     def __init__(self):
         self.id = None                                        # xs:unsigendInt
@@ -395,7 +429,7 @@ class RepresentationBase(XMLNode):
 
         self.frame_packings = parse_child_nodes(xmlnode, 'FramePacking', Descriptor)
         self.audio_channel_configurations = parse_child_nodes(xmlnode, 'AudioChannelConfiguration', Descriptor)
-        self.content_protections = parse_child_nodes(xmlnode, 'ContentProtection', Descriptor)
+        self.content_protections = parse_child_nodes(xmlnode, 'ContentProtection', ContentProtection)
         self.essential_properties = parse_child_nodes(xmlnode, 'EssentialProperty', Descriptor)
         self.supplemental_properties = parse_child_nodes(xmlnode, 'SupplementalProperty', Descriptor)
         self.inband_event_streams = parse_child_nodes(xmlnode, 'InbandEventStream', Descriptor)
@@ -686,6 +720,7 @@ class MPEGDASH(XMLNode):
         self.max_subsegment_duration = None                   # xs:duration
 
         self.program_informations = None                      # ProgramInformationType*
+        self.utc_timing = None                                # UTCTiming
         self.base_urls = None                                 # BaseURLType*
         self.locations = None                                 # xs:anyURI*
         self.periods = None                                   # PeriodType+
@@ -708,6 +743,7 @@ class MPEGDASH(XMLNode):
         self.max_subsegment_duration = parse_attr_value(xmlnode, 'maxSubsegmentDuration', str)
 
         self.program_informations = parse_child_nodes(xmlnode, 'ProgramInformation', ProgramInformation)
+        self.utc_timing = parse_child_nodes(xmlnode, 'UTCTiming', Descriptor)
         self.base_urls = parse_child_nodes(xmlnode, 'BaseURL', BaseURL)
         self.locations = parse_child_nodes(xmlnode, 'Location', str)
         self.periods = parse_child_nodes(xmlnode, 'Period', Period)
@@ -729,6 +765,7 @@ class MPEGDASH(XMLNode):
         write_attr_value(xmlnode, 'maxSegmentDuration', self.max_segment_duration)
         write_attr_value(xmlnode, 'maxSubsegmentDuration', self.max_subsegment_duration)
 
+        write_child_node(xmlnode, 'UTCTiming', self.utc_timing)
         write_child_node(xmlnode, 'ProgramInformation', self.program_informations)
         write_child_node(xmlnode, 'BaseURL', self.base_urls)
         write_child_node(xmlnode, 'Location', self.locations)

@@ -1,7 +1,6 @@
 from past.builtins import unicode   # python3 compat
-from xml.dom import minidom
-
 import re
+from xml.dom import minidom
 
 
 def _find_child_nodes_by_name(parent, name):

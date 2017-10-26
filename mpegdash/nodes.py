@@ -343,7 +343,7 @@ class ContentProtection(Descriptor):
 
 class CencPssh(XMLNode):
     def __init__(self):
-        self.value = None                                     # xs:string
+        self.key = None                                     # xs:string
 
     def parse(self, xmlnode):
         self.key = parse_node_value(xmlnode, str)

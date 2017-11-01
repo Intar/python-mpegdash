@@ -323,21 +323,20 @@ class ContentProtection(Descriptor):
         Descriptor.__init__(self)
 
         self.xmlns_cenc = None                                # xs:string
-        self.cenc_default_KID = None                          # xs:string
+        self.default_KID = None                          # xs:string
         self.cenc_pssh = None
 
     def parse(self, xmlnode):
         Descriptor.parse(self, xmlnode)
         self.xmlns_cenc = parse_attr_value(xmlnode, 'xmlns:cenc', str)
-        self.cenc_default_KID = parse_attr_value(xmlnode, 'cenc:default_KID', str)
-        if self.xmlns_cenc and self.cenc_default_KID:
-            self.value = None
+        self.default_KID = parse_attr_value(xmlnode, 'cenc:default_KID', str)
+        if self.default_KID:
             self.cenc_pssh = parse_child_nodes(xmlnode, 'pssh', CencPssh)
 
     def write(self, xmlnode):
         Descriptor.write(self, xmlnode)
         write_attr_value(xmlnode, 'xmlns:cenc', self.xmlns_cenc)
-        write_attr_value(xmlnode, 'cenc:cenc_default_KID', self.cenc_default_KID)
+        write_attr_value(xmlnode, 'cenc:default_KID', self.default_KID)
         write_child_node(xmlnode, 'cenc:pssh', self.cenc_pssh)
 
 
@@ -605,7 +604,7 @@ class AdaptationSet(RepresentationBase):
         write_attr_value(xmlnode, 'id', self.id)
         write_attr_value(xmlnode, 'group', self.group)
         write_attr_value(xmlnode, 'lang', self.lang)
-        write_attr_value(xmlnode, 'contentType', self.lang)
+        write_attr_value(xmlnode, 'contentType', self.content_type)
         write_attr_value(xmlnode, 'par', self.par)
         write_attr_value(xmlnode, 'minBandwidth', self.min_bandwidth)
         write_attr_value(xmlnode, 'maxBandwidth', self.max_bandwidth)

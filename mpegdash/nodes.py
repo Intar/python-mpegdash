@@ -127,10 +127,10 @@ class Range(XMLNode):
 
 
 class SegmentURL(XMLNode):
-    def __init__(self):
-        self.media = None                                     # xs:anyURI
+    def __init__(self, media=None, index=None):
+        self.media = media                                    # xs:anyURI
         self.media_range = None                               # xs:string
-        self.index = None                                     # xs:anyURI
+        self.index = index                                    # xs:anyURI
         self.index_range = None                               # xs:string
 
     def parse(self, xmlnode):

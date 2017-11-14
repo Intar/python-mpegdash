@@ -11,6 +11,14 @@ from mpegdash.utils import parse_child_nodes, write_child_node
 
 
 class MPEGDASHParser(object):
+    def __init__(self, mpd):
+        self.mpd = mpd
+
+    def __repr__(self):
+        xml_doc = minidom.Document()
+        write_child_node(xml_doc, 'MPD', self.mpd)
+        return xml_doc.toprettyxml()
+
     @classmethod
     def load_xmldom(cls, string_or_url):
         if '<MPD' in string_or_url:
